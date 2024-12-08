@@ -52,3 +52,21 @@ def load_data_bananas(batch_size):
     val_iter = torch.utils.data.DataLoader(BananasDataset(is_train=False),
                                            batch_size)
     return train_iter, val_iter
+
+
+
+def read_voc_images(voc_dir, is_train=True):
+    """读取所有VOC图像并标注"""
+    txt_fname = os.path.join(voc_dir, 'ImageSets', 'Segmentation',
+                             'train.txt' if is_train else 'val.txt')
+    mode = torchvision.io.image.ImageReadMode.RGB
+    with open(txt_fname, 'r') as f:
+        images = f.read().split()
+    features, labels = [], []
+    for i, fname in enumerate(images):
+        features.append(torchvision.io.read_image(os.path.join(
+            voc_dir, 'JPEGImages', f'{fname}.jpg')))
+        labels.append(torchvision.io.read_image(os.path.join(
+            voc_dir, 'SegmentationClass' ,f'{fname}.png'), mode))
+    return features, labels
+
